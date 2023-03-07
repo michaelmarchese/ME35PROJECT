@@ -1,7 +1,7 @@
 '''
 by Maddie Pero 
 
-In this example we will get data from Airtable
+In this example we will get data from Airtable.
 '''
 
 '''
