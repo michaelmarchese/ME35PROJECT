@@ -1,0 +1,16 @@
+ros2 topic list shows you the topics that are running in the script at that moment
+to see the data you want to use ros2 topic echo "/name of topic" ex. ros2 topic echo /my_publisher for simple publisher
+
+figure out how to use twist with linear and angular
+you probably need to use the simple publisher and push the x,y,z values to the topic and then maybe the node does something with it idk
+
+need to use two differnt python files(each node needs its own i think) https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html 
+
+Arrow key thing https://github.com/RoverRobotics-archive/ros2-keyboard-driver/blob/master/keystroke/arrows_to_twist.py
+
+*Robot Runs now
+!The subscriber might not even be running still need to figure that out in the file with both pub and sub
+!The publisher file also just runs the commands 
+?Why?
+TODO make the airtable link with and send data to either the publisher or Subscriber
+* I still have a file for the subscriber that i will keep there and ill mkae a new file without them combined if i need to go back
