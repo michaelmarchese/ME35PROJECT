@@ -62,7 +62,9 @@ class IRSubscriber(Node):
         print('Printing IR sensor readings:')
         for reading in msg.readings: 
             val = reading.value
-            print("IR Sensor:" + str(val))
+            #print(reading)
+            print(msg.readings[1].value)
+            #print("IR Sensor:" + str(val))
 
 
 

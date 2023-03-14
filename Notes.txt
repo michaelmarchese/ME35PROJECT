@@ -16,5 +16,7 @@ TODO make the airtable link with and send data to either the publisher or Subscr
 * I still have a file for the subscriber that i will keep there and ill mkae a new file without them combined if i need to go back
 
 !NEXTPROJECT
-* if the transform message doesnt work for cmd_vel try to use path msg for /odom (its more complicated but may be able to use position instead of velocity)
-* twist is the only thing that works with /cmd_vel try to find another topic that will work and path wont work for /odom idt
+TODO make the ir sensor figure out what distance is 6 inches from the object with the ir stuff
+TODO figure out how to send the data from a zip file to github
+TODO Take the pictures and make them a a zip to send to the google 
+TODO tensor flow stuff
