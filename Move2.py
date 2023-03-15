@@ -5,6 +5,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist,Vector3
 from rclpy.qos import qos_profile_sensor_data
 from irobot_create_msgs.msg import IrIntensityVector
+from Tensorflow import tensortest
 
 from irobot_create_msgs.action import RotateAngle
 
@@ -136,9 +137,9 @@ class IRSubscriber(Node):
         for reading in msg.readings: 
             val = reading.value
             #print(reading)
-            print(msg.readings[1].value)
+            print(msg.readings[3].value)
             #print("IR Sensor:" + str(val))
-        return print(msg.readings[1].value)
+        return print(msg.readings[3].value)
 
 
 def goleft90(args=None):
@@ -149,7 +150,7 @@ def goleft90(args=None):
     speed = 0.5 # Max 1.9
 
     action_client.send_goal(angle, speed)
-    rclpy.spin(action_client)
+    rclpy.spin_once(action_client)
 
 def goright90(args=None):
     rclpy.init(args=args)
@@ -159,25 +160,26 @@ def goright90(args=None):
     speed = 0.5 # Max 1.9
 
     action_client.send_goal(angle, speed)
-    rclpy.spin(action_client)
+    rclpy.spin_once(action_client)
 
 def printIRSTUFF(args=None):
     rclpy.init(args=args)
     IR_subscriber = IRSubscriber()
     rclpy.spin(IR_subscriber)
     IR_subscriber.printIR()
+    IR_subscriber.destroy_node()
 
 
 def main(args=None):
-    printIRSTUFF()
-
-    print
-
-
+    #printIRSTUFF()
+    print(tensortest())
+#! if you are having trouble with things not working try this spin_once
 
     try:
         # Spins the Node to activate the callbacks
-        rclpy.spin(simple_publisher)
+        print("hi")
+        # printIRSTUFF()
+        #rclpy.spin_once(simple_publisher)
 
 
 
