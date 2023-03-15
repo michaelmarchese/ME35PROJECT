@@ -9,21 +9,20 @@ import time
 
 
 def tensortest():
-    picam2 = Picamera2()
-    picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous}) #sets auto focus mode
+    # picam2 = Picamera2()
+    # picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous}) #sets auto focus mode
 
 
-    picam2.start() #must start the camera before taking any images
-    time.sleep(1)
+    # picam2.start() #must start the camera before taking any images
+    # time.sleep(1)
 
-    picam2.capture_file('/home/tuftsrobot/ME35PROJECT/imagetensor.jpg')
-    picam2.stop()
+    # picam2.capture_file('/home/tuftsrobot/ME35PROJECT/imagetensor.jpg')
 
     # Disable scientific notation for clarity
     np.set_printoptions(suppress=True)
 
+
     # Load the model
-    model = load_model("/home/tuftsrobot/ME35PROJECT/keras_model.h5", compile=False)
 
     # Load the labels
     class_names = open("/home/tuftsrobot/ME35PROJECT/labels.txt", "r").readlines()
@@ -58,5 +57,7 @@ def tensortest():
     # Print prediction and confidence score
     print("Class:", class_name[2:], end="")
     print("Confidence Score:", confidence_score)
+
+    # picam2.stop()
 
     return confidence_score

@@ -1,13 +1,82 @@
 import rclpy
+from keras.models import load_model  # TensorFlow is required for Keras to work
+from PIL import Image, ImageOps  # Install pillow instead of PIL
+import numpy as np
 from rclpy.action import ActionClient
 from rclpy.node import Node
 from std_msgs.msg import String 
 from geometry_msgs.msg import Twist,Vector3
 from rclpy.qos import qos_profile_sensor_data
 from irobot_create_msgs.msg import IrIntensityVector
-from Tensorflow import tensortest
+from picamera2 import Picamera2 
+import cv2 as cv 
+import numpy as np
+from libcamera import controls
+import time
 
 from irobot_create_msgs.action import RotateAngle
+
+picam2 = Picamera2()
+picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous}) #sets auto focus mode
+
+
+picam2.start() #must start the camera before taking any images
+model = load_model("/home/tuftsrobot/ME35PROJECT/keras_model.h5", compile=False)
+
+def tensortest():
+    # picam2 = Picamera2()
+    # picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous}) #sets auto focus mode
+
+
+    # picam2.start() #must start the camera before taking any images
+    # time.sleep(1)
+
+    # picam2.capture_file('/home/tuftsrobot/ME35PROJECT/imagetensor.jpg')
+
+    # Disable scientific notation for clarity
+    np.set_printoptions(suppress=True)
+
+
+    # Load the model
+
+    # Load the labels
+    class_names = open("/home/tuftsrobot/ME35PROJECT/labels.txt", "r").readlines()
+
+    # Create the array of the right shape to feed into the keras model
+    # The 'length' or number of images you can put into the array is
+    # determined by the first position in the shape tuple, in this case 1
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+
+    # Replace this with the path to your image
+    image = Image.open('/home/tuftsrobot/ME35PROJECT/imagetensor.jpg').convert("RGB")
+
+    # resizing the image to be at least 224x224 and then cropping from the center
+    size = (224, 224)
+    image = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+
+    # turn the image into a numpy array
+    image_array = np.asarray(image)
+
+    # Normalize the image
+    normalized_image_array = (image_array.astype(np.float32) / 127.5) - 1
+
+    # Load the image into the array
+    data[0] = normalized_image_array
+
+    # Predicts the model
+    prediction = model.predict(data)
+    index = np.argmax(prediction)
+    class_name = class_names[index]
+    confidence_score = prediction[0][index]
+
+    # Print prediction and confidence score
+    print("Class:", class_name[2:], end="")
+    print("Confidence Score:", confidence_score)
+
+    # picam2.stop()
+    #! ill comment what was working before just check u need to get the class
+    # return confidence_score
+    return [confidence_score, class_name]
 
 #*Action stuff(left right)
 class RotateActionClient(Node):
@@ -64,14 +133,14 @@ class SimplePublisher(Node):
         # Creates a publisher based on the message type "String" that has been imported from the std_msgs module above
         #* Works if you actaully just put cmd_vel but isnt sending to to the subscriber tho
         self.publisher_ = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.subscription = self.create_subscription(IrIntensityVector, '/ir_intensity', self.listener_callback, qos_profile_sensor_data)
+        #self.subscription = self.create_subscription(IrIntensityVector, '/ir_intensity', self.listener_callback, qos_profile_sensor_data)
 
         # Set delay in seconds
         timer_period = 0.5  
 
         # Creates a timer that triggers a callback function after the set timer_period
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.timer2 = self.create_timer(timer_period, self.listener_callback)
+        #self.timer2 = self.create_timer(timer_period, self.listener_callback)
         
         self.IR_data = 0
         # Sets initial counter to zero
@@ -82,12 +151,29 @@ class SimplePublisher(Node):
         self.msg = Twist()
         
         # Publishes `msg` to topic 
-        x = input("Start Or Stop:")
-        if(x == 'Start'):
+        #x = input("Start Or Stop:")
+        #if(x == 'Start'):
 
-            self.msg.linear.x = 0.1
-            self.publisher_.publish(self.msg)  
-            x = 'Stop'
+        self.msg.linear.x = 0.1
+        self.publisher_.publish(self.msg)  
+        time.sleep(1)
+
+        picam2.capture_file('/home/tuftsrobot/ME35PROJECT/imagetensor.jpg')
+        lens_position = picam2.capture_metadata()['LensPosition']
+        print(lens_position)
+
+        #! this is not working it worked when i just had it return the confidence interval it could be that its making it a string or something try bringing it back later and check
+        tensordata = tensortest()
+        print("ClassMIKE" +tensordata[1])
+        print("cONFIDENCE"+ str(tensordata[0]))
+        if(tensordata[1] == "0 Class 1" and int(tensordata[0])>0.9996):
+            goleft90()
+            print("complete")
+           # x = 'Stop'
+        # if(tensordata()>0.9996):
+        #     goleft90()
+        #     print("complete")
+        # # x = 'Stop'
 
 
 #*IR intensity
@@ -143,7 +229,6 @@ class IRSubscriber(Node):
 
 
 def goleft90(args=None):
-    rclpy.init(args=args)
     action_client = RotateActionClient()
 
     angle = 1.57
@@ -171,13 +256,17 @@ def printIRSTUFF(args=None):
 
 
 def main(args=None):
+    rclpy.init(args=args)
+
+    # Creates the SimplePublisher Node
+    simple_publisher = SimplePublisher()
     #printIRSTUFF()
-    print(tensortest())
+    #print(tensortest())
 #! if you are having trouble with things not working try this spin_once
 
     try:
         # Spins the Node to activate the callbacks
-        print("hi")
+        rclpy.spin(simple_publisher)
         # printIRSTUFF()
         #rclpy.spin_once(simple_publisher)
 
