@@ -1,2 +1,7 @@
-0 Class 1
-1 Class 2
+0 Mug
+1 Poopsie
+2 Tractor
+3 Mario
+4 Kiwi
+5 Rubiks
+6 Jumbo
